@@ -2,17 +2,9 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Send, Clock, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
-
-const showTypes = [
-  { id: "corporate", label: "Corporate Magic", desc: "Sleight of hand for galas and mixers." },
-  { id: "wedding", label: "Wedding Entertainment", desc: "Interactive magic for your special day." },
-  { id: "private", label: "Private Events", desc: "Intimate performances for house parties." },
-  { id: "theatre", label: "Theatre / Fringe", desc: "Full stage show bookings." }
-];
+import { Send, Clock, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
 
 export default function Booking() {
-  const [selectedType, setSelectedType] = useState(showTypes[0].id);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -24,7 +16,6 @@ export default function Booking() {
     formData.append("access_key", "887f9ee9-f4b6-4e82-9716-306c8f38aff5");
     formData.append("subject", "New Inquiry from Jamie Leonard Site");
     formData.append("from_name", "Jamie Leonard Website");
-    formData.append("performance_type", showTypes.find(t => t.id === selectedType)?.label || selectedType);
 
     const object = Object.fromEntries(formData);
     const json = JSON.stringify(object);
@@ -80,32 +71,6 @@ export default function Booking() {
                     <h4 className="text-white font-bold uppercase tracking-widest text-xs mb-2">Location</h4>
                     <p className="text-white/40 text-sm">Based in Edinburgh. Travels UK wide.</p>
                 </div>
-            </div>
-          </div>
-
-          <div className="space-y-4 pt-10 border-t border-white/5">
-            <p className="text-white/20 uppercase tracking-[0.3em] text-[10px]">Select Performance Type</p>
-            <div className="grid grid-cols-1 gap-3">
-                {showTypes.map((type) => (
-                    <button
-                        key={type.id}
-                        type="button"
-                        onClick={() => setSelectedType(type.id)}
-                        className={`flex items-center justify-between p-6 transition-all duration-300 rounded-sm border ${
-                            selectedType === type.id 
-                            ? "bg-white border-white text-black translate-x-4" 
-                            : "bg-transparent border-white/10 text-white hover:border-white/30"
-                        }`}
-                    >
-                        <div className="text-left">
-                            <span className="block font-bold uppercase tracking-wider text-sm">{type.label}</span>
-                            <span className={`text-[10px] uppercase tracking-widest ${selectedType === type.id ? "text-black/50" : "text-white/30"}`}>
-                                {type.desc}
-                            </span>
-                        </div>
-                        <ChevronRight size={18} className={selectedType === type.id ? "opacity-100" : "opacity-20"} />
-                    </button>
-                ))}
             </div>
           </div>
         </div>
