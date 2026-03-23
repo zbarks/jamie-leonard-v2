@@ -11,7 +11,6 @@ export default function Home() {
       <Navbar />
       <Hero />
       <NewShow />
-      <Gallery />
       <Booking />
       <Footer />
     </main>

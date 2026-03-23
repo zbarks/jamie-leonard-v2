@@ -49,9 +49,8 @@ export default function PastShows() {
                                 <span className="text-[10px] uppercase tracking-[0.3em] text-white/40 font-bold">{show.stats}</span>
                             </div>
                         </div>
-                        <div className="flex-1 relative aspect-video w-full overflow-hidden rounded-sm group">
-                            <img src={show.image} alt={show.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" />
-                            <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                        <div className="flex-1 relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-sm group">
+                            <img src={show.image} alt={show.title} className="w-full h-full object-contain bg-zinc-900 group-hover:scale-105 transition-all duration-700" />
                         </div>
                     </motion.div>
                 ))}

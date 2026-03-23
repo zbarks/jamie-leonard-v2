@@ -24,7 +24,7 @@ export default function Footer() {
               { name: "Home", href: "/" },
               { name: "Tour Calendar", href: "/calendar" },
               { name: "Past Shows", href: "/past-shows" },
-              { name: "Gallery", href: "/#gallery" },
+              { name: "Gallery", href: "/gallery" },
               { name: "Bookings", href: "/#booking" }
             ].map((link) => (
               <li key={link.name}>
@@ -41,7 +41,7 @@ export default function Footer() {
           <ul className="space-y-4">
             <li className="flex items-center gap-4 text-white/40 group cursor-pointer hover:text-white transition-colors">
               <Mail size={16} className="text-gold/50 group-hover:text-gold" />
-              <span className="text-[10px] uppercase tracking-widest font-bold font-sans">hello@jamieleonard.co.uk</span>
+              <a href="mailto:jamieleonardmagic@gmail.com" className="text-[10px] uppercase tracking-widest font-bold font-sans">jamieleonardmagic@gmail.com</a>
             </li>
             <li className="flex items-center gap-4 text-white/40 group cursor-pointer hover:text-white transition-colors">
               <MapPin size={16} className="text-gold/50 group-hover:text-gold" />

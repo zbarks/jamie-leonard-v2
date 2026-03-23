@@ -18,18 +18,18 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "The Show", href: "/#fringe" },
-    { name: "Calendar", href: "/calendar" },
-    { name: "Past", href: "/past-shows" },
-    { name: "Gallery", href: "/#gallery" },
+    { name: "Home", href: "/" },
+    { name: "The Show", href: "/the-show" },
+    { name: "Archive", href: "/past-shows" },
+    { name: "Gallery", href: "/gallery" },
   ];
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 px-6 md:px-20 py-8 ${isScrolled ? "bg-black/80 backdrop-blur-lg py-5 border-b border-white/5" : "bg-transparent"}`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <span className="text-lg md:text-xl font-serif text-white tracking-[0.3em] uppercase">Jamie Leonard</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Logo removed as requested */}
+        </div>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-16">
@@ -58,48 +58,52 @@ export default function Navbar() {
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 bg-black z-[100] flex flex-col p-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col p-10 overflow-hidden"
           >
-            <div className="flex justify-between items-center mb-20">
-              <span className="text-xl font-serif text-white uppercase tracking-widest">Jamie Leonard</span>
-              <button onClick={() => setIsMenuOpen(false)} className="text-white">
-                <X size={24} />
-              </button>
-            </div>
+            {/* Separate blur layer for maximum effect */}
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-3xl" />
+            
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="flex justify-end items-center mb-20">
+                <button onClick={() => setIsMenuOpen(false)} className="text-white p-2">
+                  <X size={32} />
+                </button>
+              </div>
 
-            <div className="flex flex-col gap-12">
-              {navLinks.map((link, idx) => (
+              <div className="flex flex-col gap-12 items-center text-center">
+                {navLinks.map((link, idx) => (
+                  <Link 
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="text-5xl font-serif text-white/90 hover:text-gold transition-colors"
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * idx }}
+                    >
+                      {link.name}
+                    </motion.div>
+                  </Link>
+                ))}
                 <Link 
-                  key={link.name}
-                  href={link.href}
+                  href="/#booking"
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-5xl font-serif text-white/90 hover:text-gold transition-colors"
+                  className="w-full max-w-xs py-6 bg-white text-black font-bold uppercase tracking-[0.3em] mt-10 text-center text-sm rounded-full"
                 >
                   <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * idx }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
                   >
-                    {link.name}
+                      Inquire
                   </motion.div>
                 </Link>
-              ))}
-              <Link 
-                href="/#booking"
-                onClick={() => setIsMenuOpen(false)}
-                className="w-full py-6 bg-white text-black font-bold uppercase tracking-[0.3em] mt-10 text-center text-sm"
-              >
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                >
-                    Inquire
-                </motion.div>
-              </Link>
+              </div>
             </div>
           </motion.div>
         )}
