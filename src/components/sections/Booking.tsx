@@ -2,17 +2,43 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Send, Clock, MapPin, Sparkles } from "lucide-react";
-
-const showTypes = [
-  { id: "corporate", label: "Corporate Magic", desc: "Sleight of hand for galas and mixers." },
-  { id: "wedding", label: "Wedding Entertainment", desc: "Interactive magic for your special day." },
-  { id: "private", label: "Private Events", desc: "Intimate performances for house parties." },
-  { id: "theatre", label: "Theatre / Fringe", desc: "Full stage show bookings." }
-];
+import { Send, Clock, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
 
 export default function Booking() {
-  const [selectedType, setSelectedType] = useState(showTypes[0].id);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const formData = new FormData(e.currentTarget);
+    formData.append("access_key", "887f9ee9-f4b6-4e82-9716-306c8f38aff5");
+    formData.append("subject", "New Inquiry from Jamie Leonard Site");
+    formData.append("from_name", "Jamie Leonard Website");
+
+    const object = Object.fromEntries(formData);
+    const json = JSON.stringify(object);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: json
+      });
+      const result = await response.json();
+      if (result.success) {
+        setIsSuccess(true);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <section className="py-32 px-6 md:px-20 bg-black relative overflow-hidden" id="booking">
@@ -44,31 +70,6 @@ export default function Booking() {
                 </div>
             </div>
           </div>
-
-          <div className="space-y-4 pt-10 border-t border-white/5">
-            <p className="text-white/20 uppercase tracking-[0.3em] text-[10px]">Select Performance Type</p>
-            <div className="grid grid-cols-1 gap-3">
-                {showTypes.map((type) => (
-                    <button
-                        key={type.id}
-                        onClick={() => setSelectedType(type.id)}
-                        className={`flex items-center justify-between p-6 transition-all duration-300 rounded-sm border ${
-                            selectedType === type.id 
-                            ? "bg-white border-white text-black translate-x-4" 
-                            : "bg-transparent border-white/10 text-white hover:border-white/30"
-                        }`}
-                    >
-                        <div className="text-left">
-                            <span className="block font-bold uppercase tracking-wider text-sm">{type.label}</span>
-                            <span className={`text-[10px] uppercase tracking-widest ${selectedType === type.id ? "text-black/50" : "text-white/30"}`}>
-                                {type.desc}
-                            </span>
-                        </div>
-                        <ChevronRight size={18} className={selectedType === type.id ? "opacity-100" : "opacity-20"} />
-                    </button>
-                ))}
-            </div>
-          </div>
         </div>
 
         <div className="flex-1">
@@ -76,39 +77,86 @@ export default function Booking() {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-[#0A0A0A] p-10 md:p-16 border border-white/5 relative"
+            className="bg-[#0A0A0A] p-10 md:p-16 border border-white/5 relative min-h-[600px] flex flex-col justify-center"
           >
             <div className="absolute -top-4 -left-4 w-12 h-12 border-t border-l border-gold/50"></div>
             <div className="absolute -bottom-4 -right-4 w-12 h-12 border-b border-r border-gold/50"></div>
 
-            <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-              <div className="space-y-2 group">
-                <label className="text-[10px] uppercase tracking-[0.4em] text-white/30 group-focus-within:text-gold transition-colors">Your Name</label>
-                <input type="text" className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-white text-white transition-all" placeholder="Enter name" />
-              </div>
+            <AnimatePresence mode="wait">
+              {!isSuccess ? (
+                <motion.form 
+                  key="form"
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="space-y-8" 
+                  onSubmit={handleSubmit}
+                >
+                  <div className="space-y-2 group">
+                    <label className="text-[10px] uppercase tracking-[0.4em] text-white/30 group-focus-within:text-gold transition-colors">Your Name</label>
+                    <input name="name" type="text" className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-white text-white transition-all" placeholder="Enter name" required />
+                  </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-2 group">
-                    <label className="text-[10px] uppercase tracking-[0.4em] text-white/30 group-focus-within:text-gold transition-colors">Email Address</label>
-                    <input type="email" className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-white text-white transition-all" placeholder="hello@example.com" />
-                </div>
-                <div className="space-y-2 group">
-                    <label className="text-[10px] uppercase tracking-[0.4em] text-white/30 group-focus-within:text-gold transition-colors">Event Date</label>
-                    <input type="text" className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-white text-white transition-all" placeholder="DD/MM/YYYY" />
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2 group">
+                        <label className="text-[10px] uppercase tracking-[0.4em] text-white/30 group-focus-within:text-gold transition-colors">Email Address</label>
+                        <input name="email" type="email" className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-white text-white transition-all" placeholder="hello@example.com" required />
+                    </div>
+                    <div className="space-y-2 group">
+                        <label className="text-[10px] uppercase tracking-[0.4em] text-white/30 group-focus-within:text-gold transition-colors">Event Date</label>
+                        <input name="date" type="text" className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-white text-white transition-all" placeholder="DD/MM/YYYY" />
+                    </div>
+                  </div>
 
-              <div className="space-y-2 group">
-                <label className="text-[10px] uppercase tracking-[0.4em] text-white/30 group-focus-within:text-gold transition-colors">Message</label>
-                <textarea rows={4} className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-white text-white transition-all resize-none" placeholder="Tell Jamie about your event..." />
-              </div>
+                  <div className="space-y-2 group">
+                    <label className="text-[10px] uppercase tracking-[0.4em] text-white/30 group-focus-within:text-gold transition-colors">Performance Type</label>
+                    <input name="type" type="text" className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-white text-white transition-all" placeholder="e.g. Wedding, Corporate, Theatre" />
+                  </div>
 
-              <button className="group flex items-center gap-4 w-full justify-center py-6 bg-white text-black font-bold uppercase tracking-[0.3em] hover:bg-gold transition-all duration-500">
-                <Send size={18} />
-                Send Inquiry
-                <Sparkles size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            </form>
+                  <div className="space-y-2 group">
+                    <label className="text-[10px] uppercase tracking-[0.4em] text-white/30 group-focus-within:text-gold transition-colors">Message</label>
+                    <textarea name="message" rows={4} className="w-full bg-transparent border-b border-white/10 py-4 outline-none focus:border-white text-white transition-all resize-none" placeholder="Tell Jamie about your event..." />
+                  </div>
+
+                  <button 
+                    disabled={isSubmitting}
+                    className="group flex items-center gap-4 w-full justify-center py-6 bg-white text-black font-bold uppercase tracking-[0.3em] hover:bg-gold transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <div className="w-6 h-6 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+                    ) : (
+                      <>
+                        <Send size={18} />
+                        Send Inquiry
+                        <Sparkles size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </>
+                    )}
+                  </button>
+                </motion.form>
+              ) : (
+                <motion.div 
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center space-y-6"
+                >
+                  <div className="flex justify-center">
+                    <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center border border-gold/20">
+                      <CheckCircle2 className="text-gold" size={40} />
+                    </div>
+                  </div>
+                  <h4 className="text-3xl font-serif text-white tracking-wide">Inquiry Sent</h4>
+                  <p className="text-white/40 text-sm leading-loose uppercase tracking-widest px-10">
+                    Your magic is in motion. <br /> Jamie will be in touch shortly.
+                  </p>
+                  <button 
+                    onClick={() => setIsSuccess(false)}
+                    className="text-gold uppercase tracking-[0.3em] text-[10px] pt-10 hover:text-white transition-colors"
+                  >
+                    Send another inquiry
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
       </div>
