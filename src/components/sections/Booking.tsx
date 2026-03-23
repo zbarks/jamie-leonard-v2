@@ -118,6 +118,7 @@ export default function Booking() {
                   </div>
 
                   <button 
+                    type="submit"
                     disabled={isSubmitting}
                     className="group flex items-center gap-4 w-full justify-center py-6 bg-white text-black font-bold uppercase tracking-[0.3em] hover:bg-gold transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
