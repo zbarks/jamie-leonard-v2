@@ -46,44 +46,55 @@ export default function Hero() {
 
   return (
     <section ref={containerRef} className="relative w-full h-[110vh] bg-black overflow-hidden flex items-center justify-center">
-      {/* Background Image Wrapper for "Extending" the image feel */}
+      {/* Background Image Wrapper */}
       <div 
         ref={imageRef}
-        className="absolute inset-0 w-full h-[120%] z-0 flex justify-end"
+        className="absolute inset-0 w-full h-[120%] z-0"
       >
-        <div className="relative w-full md:w-[60%] h-full">
+        {/* Desktop Image */}
+        <div className="hidden md:block absolute inset-0 max-w-[1400px] mx-auto overflow-hidden">
           <Image 
-            src="/assets/images/jamie-hero.jpg"
+            src="/assets/images/hero-web-new.jpg"
             alt="Jamie Leonard Magician"
             fill
             priority
-            className="object-cover object-top grayscale-[30%] contrast-125 md:object-contain md:object-right"
+            className="object-contain object-center grayscale-[20%] contrast-110 p-12 md:p-32"
           />
-          {/* Gradients to blend and focus - Mobile stays full, Desktop blends from left */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black md:hidden"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent hidden md:block w-1/2"></div>
         </div>
         
-        {/* Full screen overlays for mobile / background blending */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black md:hidden"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black opacity-60 md:opacity-40"></div>
+        {/* Mobile Image */}
+        <div className="md:hidden absolute inset-0">
+          <Image 
+            src="/assets/images/hero-mobile-new.jpg"
+            alt="Jamie Leonard Magician"
+            fill
+            priority
+            className="object-cover object-center grayscale-[20%] contrast-110"
+          />
+        </div>
+
+        {/* Gradients to blend and focus */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black opacity-40"></div>
+        
+        {/* Extra bottom blend for the next section */}
+        <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-black to-transparent"></div>
       </div>
 
-      <div ref={textRef} className="relative z-10 text-center md:text-left md:w-full md:max-w-7xl md:mx-auto md:px-20 pointer-events-none mt-20">
+      <div ref={textRef} className="relative z-10 text-center px-4 pointer-events-none mt-20">
         <h1 className="text-7xl md:text-[14rem] font-serif mb-4 leading-none tracking-tighter uppercase text-white drop-shadow-2xl">
             Jamie <br /> Leonard
         </h1>
         
-        {/* The Gold Bit Updated */}
-        <div className="flex items-center justify-center md:justify-start gap-4 mb-12">
+        <div className="flex items-center justify-center gap-4 mb-12">
             <div className="h-[1px] w-8 md:w-16 bg-gold/50"></div>
             <p className="text-gold text-[10px] md:text-sm tracking-[0.4em] uppercase font-sans font-medium max-w-[280px] md:max-w-none leading-relaxed">
                 One of UK’s no.1 rising stars in magic
             </p>
-            <div className="h-[1px] w-8 md:w-16 bg-gold/50 hidden md:block"></div>
+            <div className="h-[1px] w-8 md:w-16 bg-gold/50"></div>
         </div>
         
-        <div className="flex justify-center md:justify-start gap-4 pointer-events-auto">
+        <div className="flex justify-center gap-4 pointer-events-auto">
             <a href="#fringe" className="flex items-center gap-3 px-10 py-5 bg-white text-black font-bold uppercase tracking-widest text-[10px] md:text-xs hover:bg-gold hover:text-white transition-all duration-300 rounded-full group">
                 <Ticket size={16} className="group-hover:rotate-12 transition-transform" />
                 Blink of an Eye
