@@ -21,6 +21,7 @@ export default function Booking() {
     const json = JSON.stringify(object);
 
     try {
+      console.log("Submitting form...", object);
       const response = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: {
@@ -30,11 +31,15 @@ export default function Booking() {
         body: json
       });
       const result = await response.json();
+      console.log("Web3Forms Response:", result);
       if (result.success) {
         setIsSuccess(true);
+      } else {
+        alert("Submission failed: " + (result.message || "Unknown error"));
       }
     } catch (error) {
-      console.error(error);
+      console.error("Fetch error:", error);
+      alert("An error occurred. Please check your connection.");
     } finally {
       setIsSubmitting(false);
     }
