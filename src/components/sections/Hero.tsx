@@ -4,29 +4,15 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ChevronDown, Ticket } from "lucide-react";
-import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!containerRef.current || !textRef.current || !imageRef.current) return;
-
-    // Simple parallax effect on scroll
-    gsap.to(imageRef.current, {
-      y: 100,
-      ease: "none",
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top top",
-        end: "bottom top",
-        scrub: true,
-      }
-    });
+    if (!containerRef.current || !textRef.current) return;
 
     gsap.to(textRef.current, {
       opacity: 0,
@@ -46,43 +32,17 @@ export default function Hero() {
 
   return (
     <section ref={containerRef} className="relative w-full h-[110vh] bg-black overflow-hidden flex items-center justify-center">
-      {/* Background Image Wrapper */}
-      <div 
-        ref={imageRef}
-        className="absolute inset-0 w-full h-[120%] z-0"
-      >
-        {/* Desktop Image */}
-        <div className="hidden md:block absolute inset-0 max-w-[1400px] mx-auto overflow-hidden">
-          <Image 
-            src="/assets/images/hero-web-new.jpg"
-            alt="Jamie Leonard Magician"
-            fill
-            priority
-            className="object-contain object-center grayscale-[20%] contrast-110 p-12 md:p-32"
-          />
-        </div>
+      {/* Subtle Textured Background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 noise"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900/20 to-black"></div>
         
-        {/* Mobile Image */}
-        <div className="md:hidden absolute inset-0">
-          <Image 
-            src="/assets/images/hero-mobile-new.jpg"
-            alt="Jamie Leonard Magician"
-            fill
-            priority
-            className="object-cover object-center grayscale-[20%] contrast-110"
-          />
-        </div>
-
-        {/* Gradients to blend and focus */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black opacity-40"></div>
-        
-        {/* Extra bottom blend for the next section */}
-        <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-black to-transparent"></div>
+        {/* Subtle glow center */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/5 blur-[120px] rounded-full pointer-events-none" />
       </div>
 
       <div ref={textRef} className="relative z-10 text-center px-4 pointer-events-none mt-20">
-        <h1 className="text-7xl md:text-[14rem] font-serif mb-4 leading-none tracking-tighter uppercase text-white drop-shadow-2xl">
+        <h1 className="text-7xl md:text-[14rem] font-serif mb-4 leading-none tracking-tighter uppercase text-white">
             Jamie <br /> Leonard
         </h1>
         
