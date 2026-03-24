@@ -22,7 +22,6 @@ export default function Footer() {
           <ul className="space-y-4">
             {[
               { name: "Home", href: "/" },
-              { name: "Tour Calendar", href: "/calendar" },
               { name: "Past Shows", href: "/past-shows" },
               { name: "Gallery", href: "/gallery" },
               { name: "Bookings", href: "/#booking" }
