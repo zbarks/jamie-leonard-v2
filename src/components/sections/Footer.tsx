@@ -55,8 +55,9 @@ export default function Footer() {
         <p className="text-[10px] text-white/10 uppercase tracking-[0.3em] font-bold">
           &copy; {new Date().getFullYear()} Jamie Leonard Magic
         </p>
-        
-        <div className="flex flex-col items-center md:items-end gap-2">
+
+        <div className="flex items-center gap-6">
+            <a href="/admin" className="text-[10px] text-white/10 uppercase tracking-[0.3em] font-bold hover:text-white/30 transition-colors">Admin</a>
             <a 
                 href="https://barkerdigital.co.uk" 
                 target="_blank" 
@@ -70,11 +71,6 @@ export default function Footer() {
                 <div className="w-8 h-[1px] bg-gold/20 group-hover:w-12 group-hover:bg-gold transition-all duration-300"></div>
             </a>
         </div>
-      </div>
-
-      {/* Hidden admin link — looks like a tiny dot */}
-      <div className="flex justify-center mt-8">
-        <a href="/admin" className="w-1.5 h-1.5 rounded-full bg-white/[0.03] hover:bg-gold/30 transition-colors" aria-label="Admin" />
       </div>
     </footer>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock,
@@ -13,6 +13,8 @@ import {
   Send,
   X,
   FileText,
+  ImagePlus,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -20,6 +22,7 @@ interface Post {
   id: string;
   title: string;
   body: string;
+  image: string | null;
   date: string;
   published: boolean;
 }
@@ -44,17 +47,20 @@ export default function AdminPage() {
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Stored password for API calls
   const [storedPw, setStoredPw] = useState("");
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setAuthError(false);
 
-    // Verify password by making an authed request
     const res = await fetch("/api/posts", {
       headers: { "x-admin-password": password },
     });
@@ -80,14 +86,67 @@ export default function AdminPage() {
     setLoading(false);
   }
 
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageFile(file);
+    setImageUrl(null);
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setImagePreview(ev.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage() {
+    setImageFile(null);
+    setImagePreview(null);
+    setImageUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function uploadImage(): Promise<string | null> {
+    if (!imageFile) return imageUrl;
+
+    setUploading(true);
+
+    // Convert file to base64
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(imageFile);
+    });
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-password": storedPw,
+      },
+      body: JSON.stringify({ data: base64 }),
+    });
+
+    setUploading(false);
+
+    if (res.ok) {
+      const data = await res.json();
+      return data.url;
+    }
+    return null;
+  }
+
   async function handlePublish(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim() || !body.trim()) return;
 
     setPublishing(true);
 
+    const finalImage = await uploadImage();
+
     if (editingPost) {
-      // Update existing post
       const res = await fetch("/api/posts", {
         method: "PUT",
         headers: {
@@ -98,6 +157,7 @@ export default function AdminPage() {
           id: editingPost.id,
           title: title.trim(),
           body: body.trim(),
+          image: finalImage,
         }),
       });
 
@@ -107,7 +167,6 @@ export default function AdminPage() {
         loadPosts();
       }
     } else {
-      // Create new post
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: {
@@ -117,6 +176,7 @@ export default function AdminPage() {
         body: JSON.stringify({
           title: title.trim(),
           body: body.trim(),
+          image: finalImage,
           published: true,
         }),
       });
@@ -164,6 +224,9 @@ export default function AdminPage() {
     setEditingPost(post);
     setTitle(post.title);
     setBody(post.body);
+    setImageUrl(post.image || null);
+    setImagePreview(post.image || null);
+    setImageFile(null);
     setShowEditor(true);
   }
 
@@ -172,6 +235,10 @@ export default function AdminPage() {
     setEditingPost(null);
     setTitle("");
     setBody("");
+    setImageUrl(null);
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   // --- LOGIN SCREEN ---
@@ -251,6 +318,9 @@ export default function AdminPage() {
                 setEditingPost(null);
                 setTitle("");
                 setBody("");
+                setImageUrl(null);
+                setImageFile(null);
+                setImagePreview(null);
               }}
               className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold uppercase tracking-[0.15em] text-[10px] rounded-full hover:bg-gold hover:text-white transition-all duration-300"
             >
@@ -292,7 +362,7 @@ export default function AdminPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-6"
+              className="fixed inset-0 z-50 flex items-start justify-center pt-12 px-6 overflow-y-auto"
             >
               <div
                 className="absolute inset-0 bg-black/80 backdrop-blur-sm"
@@ -303,7 +373,7 @@ export default function AdminPage() {
                 initial={{ opacity: 0, y: 20, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.98 }}
-                className="relative z-10 w-full max-w-2xl bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden"
+                className="relative z-10 w-full max-w-2xl bg-zinc-950 border border-white/10 rounded-2xl overflow-hidden mb-12"
               >
                 <div className="flex items-center justify-between px-8 py-5 border-b border-white/5">
                   <h2 className="text-sm font-bold text-white uppercase tracking-[0.15em]">
@@ -329,6 +399,49 @@ export default function AdminPage() {
                       placeholder="Post title…"
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white text-lg font-serif placeholder:text-white/15 focus:outline-none focus:border-gold/40 transition-colors"
                       autoFocus
+                    />
+                  </div>
+
+                  {/* Image upload */}
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.3em] text-white/30 font-bold mb-3">
+                      Photo <span className="text-white/15">(optional)</span>
+                    </label>
+
+                    {imagePreview ? (
+                      <div className="relative rounded-xl overflow-hidden border border-white/10">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-full h-48 object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={removeImage}
+                          className="absolute top-3 right-3 p-1.5 bg-black/60 backdrop-blur-sm rounded-full text-white/70 hover:text-white transition-colors"
+                        >
+                          <XCircle size={20} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full py-8 border border-dashed border-white/10 rounded-xl flex flex-col items-center gap-3 text-white/20 hover:text-white/40 hover:border-white/20 transition-all"
+                      >
+                        <ImagePlus size={24} />
+                        <span className="text-[10px] uppercase tracking-[0.2em] font-bold">
+                          Click to add a photo
+                        </span>
+                      </button>
+                    )}
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={handleFileSelect}
+                      className="hidden"
                     />
                   </div>
 
@@ -358,11 +471,13 @@ export default function AdminPage() {
                     </button>
                     <button
                       type="submit"
-                      disabled={publishing || !title.trim() || !body.trim()}
+                      disabled={publishing || uploading || !title.trim() || !body.trim()}
                       className="flex items-center gap-2 px-8 py-3 bg-gold text-black font-bold uppercase tracking-[0.15em] text-[10px] rounded-full hover:bg-gold-light transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <Send size={12} />
-                      {publishing
+                      {uploading
+                        ? "Uploading…"
+                        : publishing
                         ? "Saving…"
                         : editingPost
                         ? "Update"
@@ -394,23 +509,32 @@ export default function AdminPage() {
                 key={post.id}
                 className="group flex items-start justify-between gap-6 py-6 border-b border-white/5"
               >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-[10px] uppercase tracking-[0.3em] text-white/20 font-bold">
-                      {formatDate(post.date)}
-                    </span>
-                    {!post.published && (
-                      <span className="text-[9px] uppercase tracking-[0.2em] text-yellow-500/60 font-bold bg-yellow-500/10 px-2 py-0.5 rounded-full">
-                        Draft
+                <div className="flex gap-5 flex-1 min-w-0">
+                  {post.image && (
+                    <img
+                      src={post.image}
+                      alt=""
+                      className="w-16 h-16 rounded-lg object-cover shrink-0 border border-white/5"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-white/20 font-bold">
+                        {formatDate(post.date)}
                       </span>
-                    )}
+                      {!post.published && (
+                        <span className="text-[9px] uppercase tracking-[0.2em] text-yellow-500/60 font-bold bg-yellow-500/10 px-2 py-0.5 rounded-full">
+                          Draft
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-xl font-serif text-white truncate">
+                      {post.title}
+                    </h3>
+                    <p className="text-white/30 text-sm mt-1 truncate max-w-lg">
+                      {post.body}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-serif text-white truncate">
-                    {post.title}
-                  </h3>
-                  <p className="text-white/30 text-sm mt-1 truncate max-w-lg">
-                    {post.body}
-                  </p>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 opacity-30 group-hover:opacity-100 transition-opacity">

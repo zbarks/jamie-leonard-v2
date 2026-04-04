@@ -1,20 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { db } from "@/lib/firebase-admin";
 
-const POSTS_FILE = path.join(process.cwd(), "src/data/posts.json");
-
-// Simple admin password — change this!
-const ADMIN_PASSWORD = "jamie040426MAGIC";
-
-function getPosts() {
-  const raw = fs.readFileSync(POSTS_FILE, "utf-8");
-  return JSON.parse(raw);
-}
-
-function savePosts(posts: any[]) {
-  fs.writeFileSync(POSTS_FILE, JSON.stringify(posts, null, 2));
-}
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "jamie2026magic";
+const COLLECTION = "posts";
 
 function slugify(text: string) {
   return text
@@ -23,98 +11,137 @@ function slugify(text: string) {
     .replace(/^-|-$/g, "");
 }
 
-// GET — return all published posts (or all posts if authed)
+// GET — return all published posts (or all if admin)
 export async function GET(req: NextRequest) {
-  const posts = getPosts();
-  const isAdmin = req.headers.get("x-admin-password") === ADMIN_PASSWORD;
+  try {
+    const isAdmin =
+      req.headers.get("x-admin-password") === ADMIN_PASSWORD;
 
-  const filtered = isAdmin
-    ? posts
-    : posts.filter((p: any) => p.published);
+    let query = db.collection(COLLECTION).orderBy("date", "desc");
 
-  // Sort newest first
-  filtered.sort(
-    (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+    const snapshot = await query.get();
+    let posts = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-  return NextResponse.json(filtered);
+    if (!isAdmin) {
+      posts = posts.filter((p: any) => p.published);
+    }
+
+    return NextResponse.json(posts);
+  } catch (error: any) {
+    console.error("GET /api/posts error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch posts" },
+      { status: 500 }
+    );
+  }
 }
 
-// POST — create a new post (requires password)
+// POST — create a new post
 export async function POST(req: NextRequest) {
   const password = req.headers.get("x-admin-password");
   if (password !== ADMIN_PASSWORD) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { title, body, published = true } = await req.json();
+  try {
+    const { title, body, image = null, published = true } = await req.json();
 
-  if (!title || !body) {
+    if (!title || !body) {
+      return NextResponse.json(
+        { error: "Title and body are required" },
+        { status: 400 }
+      );
+    }
+
+    const slug = slugify(title);
+
+    // Check for duplicate slugs
+    let finalSlug = slug;
+    let counter = 1;
+    while (true) {
+      const existing = await db.collection(COLLECTION).doc(finalSlug).get();
+      if (!existing.exists) break;
+      finalSlug = `${slug}-${counter}`;
+      counter++;
+    }
+
+    const postData = {
+      title,
+      body,
+      image,
+      date: new Date().toISOString(),
+      published,
+    };
+
+    await db.collection(COLLECTION).doc(finalSlug).set(postData);
+
     return NextResponse.json(
-      { error: "Title and body are required" },
-      { status: 400 }
+      { id: finalSlug, ...postData },
+      { status: 201 }
+    );
+  } catch (error: any) {
+    console.error("POST /api/posts error:", error);
+    return NextResponse.json(
+      { error: "Failed to create post" },
+      { status: 500 }
     );
   }
-
-  const posts = getPosts();
-  const slug = slugify(title);
-
-  // Avoid duplicate slugs
-  let finalSlug = slug;
-  let counter = 1;
-  while (posts.some((p: any) => p.id === finalSlug)) {
-    finalSlug = `${slug}-${counter}`;
-    counter++;
-  }
-
-  const newPost = {
-    id: finalSlug,
-    title,
-    body,
-    date: new Date().toISOString(),
-    published,
-  };
-
-  posts.push(newPost);
-  savePosts(posts);
-
-  return NextResponse.json(newPost, { status: 201 });
 }
 
-// DELETE — remove a post (requires password)
-export async function DELETE(req: NextRequest) {
-  const password = req.headers.get("x-admin-password");
-  if (password !== ADMIN_PASSWORD) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { id } = await req.json();
-  let posts = getPosts();
-  posts = posts.filter((p: any) => p.id !== id);
-  savePosts(posts);
-
-  return NextResponse.json({ success: true });
-}
-
-// PUT — edit a post (requires password)
+// PUT — edit a post
 export async function PUT(req: NextRequest) {
   const password = req.headers.get("x-admin-password");
   if (password !== ADMIN_PASSWORD) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id, title, body, published } = await req.json();
-  const posts = getPosts();
-  const idx = posts.findIndex((p: any) => p.id === id);
+  try {
+    const { id, title, body, published, image } = await req.json();
 
-  if (idx === -1) {
-    return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    const docRef = db.collection(COLLECTION).doc(id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    const updates: any = {};
+    if (title !== undefined) updates.title = title;
+    if (body !== undefined) updates.body = body;
+    if (published !== undefined) updates.published = published;
+    if (image !== undefined) updates.image = image;
+
+    await docRef.update(updates);
+
+    return NextResponse.json({ id, ...doc.data(), ...updates });
+  } catch (error: any) {
+    console.error("PUT /api/posts error:", error);
+    return NextResponse.json(
+      { error: "Failed to update post" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE — remove a post
+export async function DELETE(req: NextRequest) {
+  const password = req.headers.get("x-admin-password");
+  if (password !== ADMIN_PASSWORD) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (title !== undefined) posts[idx].title = title;
-  if (body !== undefined) posts[idx].body = body;
-  if (published !== undefined) posts[idx].published = published;
-
-  savePosts(posts);
-  return NextResponse.json(posts[idx]);
+  try {
+    const { id } = await req.json();
+    await db.collection(COLLECTION).doc(id).delete();
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("DELETE /api/posts error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete post" },
+      { status: 500 }
+    );
+  }
 }

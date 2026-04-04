@@ -11,6 +11,7 @@ interface Post {
   id: string;
   title: string;
   body: string;
+  image: string | null;
   date: string;
   published: boolean;
 }
@@ -87,6 +88,16 @@ export default function BlogPage() {
                 >
                   <Link href={`/blog/${post.id}`} className="group block">
                     <article className="py-10 border-b border-white/5 hover:border-gold/20 transition-all duration-500">
+                      {post.image && (
+                        <div className="rounded-xl overflow-hidden mb-6 border border-white/5">
+                          <img
+                            src={post.image}
+                            alt={post.title}
+                            className="w-full h-56 md:h-72 object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                          />
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-3 mb-4">
                         <Calendar size={12} className="text-gold/50" />
                         <time className="text-[10px] uppercase tracking-[0.3em] text-white/30 font-bold">

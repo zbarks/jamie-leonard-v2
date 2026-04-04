@@ -12,6 +12,7 @@ interface Post {
   id: string;
   title: string;
   body: string;
+  image: string | null;
   date: string;
   published: boolean;
 }
@@ -113,6 +114,16 @@ export default function BlogPostPage() {
               <h1 className="text-4xl md:text-6xl font-serif text-white uppercase tracking-tight mb-12 leading-tight">
                 {post.title}
               </h1>
+
+              {post.image && (
+                <div className="rounded-xl overflow-hidden mb-12 border border-white/5">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full max-h-[500px] object-cover"
+                  />
+                </div>
+              )}
 
               <div className="h-[1px] w-16 bg-gold/30 mb-12" />
 
