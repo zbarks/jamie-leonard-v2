@@ -5,7 +5,7 @@ import path from "path";
 const POSTS_FILE = path.join(process.cwd(), "src/data/posts.json");
 
 // Simple admin password — change this!
-const ADMIN_PASSWORD = "jamie2026magic";
+const ADMIN_PASSWORD = "jamie040426MAGIC";
 
 function getPosts() {
   const raw = fs.readFileSync(POSTS_FILE, "utf-8");
