@@ -5,6 +5,8 @@ import Footer from "@/components/sections/Footer";
 import { motion } from "framer-motion";
 import { Star, Ticket, Clock, MapPin, Quote } from "lucide-react";
 
+const TICKET_URL = "https://edinburghfestival.datathistle.com/event/2980097-jamie-leonard-blink-of-an-eye/";
+
 export default function TheShow() {
   return (
     <main className="min-h-screen bg-black">
@@ -48,7 +50,7 @@ export default function TheShow() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6 pt-6">
-              <a href="https://tickets.edfringe.com" target="_blank" className="flex items-center justify-center gap-3 px-10 py-5 bg-gold text-white font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-all duration-300 rounded-full">
+              <a href={TICKET_URL} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3 px-10 py-5 bg-gold text-white font-bold uppercase tracking-widest text-xs hover:bg-white hover:text-black transition-all duration-300 rounded-full">
                   Check It Out
               </a>
             </div>

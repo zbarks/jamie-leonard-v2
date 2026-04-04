@@ -55,7 +55,7 @@ export default function Hero() {
         </div>
         
         <div className="flex justify-center gap-4 pointer-events-auto">
-            <a href="#fringe" className="flex items-center gap-3 px-10 py-5 bg-white text-black font-bold uppercase tracking-widest text-[10px] md:text-xs hover:bg-gold hover:text-white transition-all duration-300 rounded-full group">
+            <a href="https://edinburghfestival.datathistle.com/event/2980097-jamie-leonard-blink-of-an-eye/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-10 py-5 bg-white text-black font-bold uppercase tracking-widest text-[10px] md:text-xs hover:bg-gold hover:text-white transition-all duration-300 rounded-full group">
                 <Ticket size={16} className="group-hover:rotate-12 transition-transform" />
                 Blink of an Eye
             </a>

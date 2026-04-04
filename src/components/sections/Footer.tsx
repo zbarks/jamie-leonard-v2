@@ -22,6 +22,7 @@ export default function Footer() {
           <ul className="space-y-4">
             {[
               { name: "Home", href: "/" },
+              { name: "Blog", href: "/blog" },
               { name: "Past Shows", href: "/past-shows" },
               { name: "Gallery", href: "/gallery" },
               { name: "Bookings", href: "/#booking" }
@@ -69,6 +70,11 @@ export default function Footer() {
                 <div className="w-8 h-[1px] bg-gold/20 group-hover:w-12 group-hover:bg-gold transition-all duration-300"></div>
             </a>
         </div>
+      </div>
+
+      {/* Hidden admin link — looks like a tiny dot */}
+      <div className="flex justify-center mt-8">
+        <a href="/admin" className="w-1.5 h-1.5 rounded-full bg-white/[0.03] hover:bg-gold/30 transition-colors" aria-label="Admin" />
       </div>
     </footer>
   );
