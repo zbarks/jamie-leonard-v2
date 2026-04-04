@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebase-admin";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "jamie2026magic";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "jamie040426MAGIC";
 const COLLECTION = "posts";
 
 function slugify(text: string) {
