@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "jamie2026magic";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "jamie040426MAGIC";
 
 export async function POST(req: NextRequest) {
   const password = req.headers.get("x-admin-password");
