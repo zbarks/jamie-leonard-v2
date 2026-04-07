@@ -5,7 +5,7 @@ import Footer from "@/components/sections/Footer";
 import { motion } from "framer-motion";
 import { Star, Ticket, Clock, MapPin, Quote } from "lucide-react";
 
-const TICKET_URL = "https://edinburghfestival.datathistle.com/event/2980097-jamie-leonard-blink-of-an-eye/";
+const TICKET_URL = "https://www.edfringe.com/tickets/whats-on/jamie-leonard-blink-of-an-eye";
 
 export default function TheShow() {
   return (
