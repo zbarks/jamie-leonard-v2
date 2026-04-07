@@ -41,7 +41,7 @@ export default function FringeShow() {
             </div>
           </div>
 
-          <a href="https://edinburghfestival.datathistle.com/event/2980097-jamie-leonard-blink-of-an-eye/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-4 group">
+          <a href="https://www.edfringe.com/tickets/whats-on/jamie-leonard-blink-of-an-eye" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-4 group">
             <div className="w-16 h-16 rounded-full bg-gold flex items-center justify-center text-black transition-transform group-hover:scale-110">
                 <Ticket size={24} />
             </div>
