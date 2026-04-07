@@ -91,7 +91,7 @@ export default function RootLayout({
                 },
                 offers: {
                   "@type": "Offer",
-                  url: "https://edinburghfestival.datathistle.com/event/2980097-jamie-leonard-blink-of-an-eye/",
+                  url: "https://www.edfringe.com/tickets/whats-on/jamie-leonard-blink-of-an-eye",
                 },
               },
             }),
